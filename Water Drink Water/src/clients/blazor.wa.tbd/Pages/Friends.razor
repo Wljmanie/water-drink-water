@@ -1,0 +1,26 @@
+﻿@page "/friends"
+
+<h3 class="d-flex">
+    <span class="flex-fill">Friends</span>
+    <button class="btn btn-primary" @onclick="OnShowModalClick">Add Group</button>
+</h3>
+
+<Modal @ref="_modal" Title="Add Group">
+    <BodyTemplate>
+        <InputText Label="Group Name" DisplayName="Group Name" @bind-Value="_groupName"/>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+        <Button Color="ButtonColor.Primary" @onclick="OnAddGroupClick">Add</Button>
+    </FooterTemplate>
+</Modal>
+
+@if (Groups.Any())
+{
+    <ul>
+        @foreach (var group in Groups)
+        {
+            <li>@group.Name @group.Code</li>
+        }
+    </ul>
+}

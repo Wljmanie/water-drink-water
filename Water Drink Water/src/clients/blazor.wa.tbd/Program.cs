@@ -14,6 +14,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddHttpClient<UserService>(client => { client.BaseAddress = new Uri("https://localhost:7245"); });
 builder.Services.AddHttpClient<AuthService>(client => { client.BaseAddress = new Uri("https://localhost:7245"); });
+builder.Services.AddHttpClient<FriendsService>(client => { client.BaseAddress = new Uri("https://localhost:7245"); });
 
 builder.Services.AddBlazoredLocalStorageAsSingleton();
 
@@ -23,5 +24,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddFluentUIComponents();
 
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+builder.Services.AddBlazorBootstrap();
 
 await builder.Build().RunAsync();
