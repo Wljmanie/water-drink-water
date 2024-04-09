@@ -63,7 +63,7 @@ builder.Services.AddAuthentication(options =>
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            LifetimeValidator = (before, expires, token, parameters) =>
+            LifetimeValidator = (before, expires, token, parameters) => 
             {
                 if (expires is not null)
                 {

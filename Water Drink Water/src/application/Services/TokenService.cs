@@ -8,7 +8,7 @@ namespace TbdFriends.WaterDrinkWater.Application.Services;
 
 public class JwtService(IConfiguration configuration)
 {
-    public string GenerateToken(string userId, string username)
+    public (string token, DateTime expiration) GenerateToken(string userId, string username)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["auth:signing-key"]!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -19,14 +19,17 @@ public class JwtService(IConfiguration configuration)
             new Claim(ClaimTypes.Name, username),
         };
 
+        var expiration = DateTime.UtcNow.AddMinutes(1);
+
+
         var token = new JwtSecurityToken(
             issuer: configuration["auth:issuer"],
             audience: configuration["auth:audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: expiration,
             signingCredentials: credentials
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return (token: new JwtSecurityTokenHandler().WriteToken(token), expiration);
     }
 }

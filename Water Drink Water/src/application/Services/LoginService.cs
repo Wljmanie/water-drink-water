@@ -9,7 +9,7 @@ public class LoginService(
     IAccountRepository accountRepository,
     JwtService tokenService)
 {
-    public Result<string> Login(string email, string password)
+    public Result<(string token, DateTime expiration)> Login(string email, string password)
     {
         var account = accountRepository.GetByEmail(email);
 
@@ -18,9 +18,9 @@ public class LoginService(
             return Result.Forbidden();
         }
 
-        var token = tokenService.GenerateToken($"wdw|{account.Id}", account.Email);
+        var result = tokenService.GenerateToken($"wdw|{account.Id}", account.Email);
 
-        return Result.Success(token);
+        return Result.Success(result);
     }
 
     private static bool IsPasswordValid(Account account, string password)

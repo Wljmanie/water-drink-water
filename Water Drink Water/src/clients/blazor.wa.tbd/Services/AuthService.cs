@@ -1,58 +1,36 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
 using blazor.wa.tbd.Infrastructure;
-using Blazored.LocalStorage;
+using blazor.wa.tbd.Services.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace blazor.wa.tbd.Services;
 
 public class AuthService(
     HttpClient client,
-    ILocalStorageService localStorageService,
     AuthenticationStateProvider authenticationStateProvider)
 {
     public async Task Logout()
     {
-        await localStorageService.RemoveItemAsync("token");
-
-        ((CustomAuthenticationStateProvider)authenticationStateProvider).NotifyUserHasChanged();
+        await ((CustomAuthenticationStateProvider)authenticationStateProvider).Logout();
     }
 
     public async Task<bool> IsAuthenticated()
     {
-        var token = await localStorageService.GetItemAsync<string>("token");
+        var state = await authenticationStateProvider.GetAuthenticationStateAsync();
 
-        if (string.IsNullOrWhiteSpace(token))
-        {
-            return false;
-        }
+        return state.User.Identity?.IsAuthenticated ?? false;
+    }
 
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Head, "api/validate");
+    public async Task<string?> TryGetAuthToken()
+    {
+        var state = await authenticationStateProvider.GetAuthenticationStateAsync();
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var isAuthenticated = state.User.Identity?.IsAuthenticated ?? false;
 
-            var response = await client.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                await localStorageService.RemoveItemAsync("token");
-            }
-
-            return response.IsSuccessStatusCode;
-        }
-        catch (HttpRequestException _)
-        {
-            await localStorageService.RemoveItemAsync("token");
-
-            return false;
-        }
-        finally
-        {
-            ((CustomAuthenticationStateProvider)authenticationStateProvider).NotifyUserHasChanged();
-        }
+        return isAuthenticated
+            ? await ((CustomAuthenticationStateProvider)authenticationStateProvider).Token
+            : null;
     }
 
     public async Task<bool> Authenticate(string email, string password)
@@ -66,7 +44,7 @@ public class AuthService(
 
         var content = await response.Content.ReadAsStringAsync();
 
-        var loginResponse = JsonSerializer.Deserialize<UserService.LoginResponse>(content,
+        var loginResponse = JsonSerializer.Deserialize<LoginResponse>(content,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (loginResponse is null)
@@ -74,9 +52,8 @@ public class AuthService(
             return false;
         }
 
-        await localStorageService.SetItemAsync("token", loginResponse.Token);
-
-        ((CustomAuthenticationStateProvider)authenticationStateProvider).NotifyUserHasChanged();
+        await ((CustomAuthenticationStateProvider)authenticationStateProvider).Login(loginResponse.Token,
+            loginResponse.Expiration);
 
         return true;
     }
