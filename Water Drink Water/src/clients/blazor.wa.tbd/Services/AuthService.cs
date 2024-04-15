@@ -28,6 +28,11 @@ public class AuthService(
 
         var isAuthenticated = state.User.Identity?.IsAuthenticated ?? false;
 
+        if (!isAuthenticated)
+        {
+            ((CustomAuthenticationStateProvider)authenticationStateProvider).NotifyUserHasChanged();
+        }
+
         return isAuthenticated
             ? await ((CustomAuthenticationStateProvider)authenticationStateProvider).Token
             : null;
