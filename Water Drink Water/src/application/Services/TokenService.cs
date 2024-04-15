@@ -19,9 +19,8 @@ public class JwtService(IConfiguration configuration)
             new Claim(ClaimTypes.Name, username),
         };
 
-        var expiration = DateTime.UtcNow.AddMinutes(1);
-
-
+        var expiration = DateTime.UtcNow.AddHours(1);
+        
         var token = new JwtSecurityToken(
             issuer: configuration["auth:issuer"],
             audience: configuration["auth:audience"],
