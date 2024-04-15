@@ -7,8 +7,7 @@ namespace blazor.wa.tbd.Infrastructure;
 public class CustomAuthenticationStateProvider(ILocalStorageService localStorageService)
     : AuthenticationStateProvider
 {
-    private readonly Lazy<ValueTask<string>> _token = new(value: localStorageService.GetItemAsync<string>("token"));
-    public ValueTask<string> Token => _token.Value;
+    public ValueTask<string> Token => localStorageService.GetItemAsync<string>("token");
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
@@ -21,12 +20,11 @@ public class CustomAuthenticationStateProvider(ILocalStorageService localStorage
 
         var expires = await localStorageService.GetItemAsync<long>("expires");
 
-        var identity = expires > DateTime.UtcNow.Ticks
-            ? new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, "user") },
-                authenticationType: nameof(CustomAuthenticationStateProvider))
-            : new ClaimsIdentity();
-
-        return new AuthenticationState(new ClaimsPrincipal(identity));
+        return expires > DateTime.UtcNow.Ticks
+            ? new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(
+                new[] { new Claim(ClaimTypes.Name, "user") },
+                authenticationType: nameof(CustomAuthenticationStateProvider))))
+            : new AuthenticationState(new ClaimsPrincipal());
     }
 
     public async Task Login(string token, long expiration)
