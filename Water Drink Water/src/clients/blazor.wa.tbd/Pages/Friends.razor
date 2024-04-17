@@ -1,5 +1,7 @@
 ﻿@page "/friends"
 
+@attribute [Authorize]
+
 <h3 class="d-flex">
     <span class="flex-fill">Friends</span>
     <button class="btn btn-primary" @onclick="OnShowModalClick">Add Group</button>

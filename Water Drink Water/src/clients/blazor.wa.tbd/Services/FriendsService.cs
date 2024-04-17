@@ -5,16 +5,13 @@ using viewmodels;
 
 namespace blazor.wa.tbd.Services;
 
-public class FriendsService(HttpClient client, ILocalStorageService localStorage)
+public class FriendsService(HttpClient client, AuthService authService)
 {
-    private readonly Lazy<ValueTask<string>> _token = new(value: localStorage.GetItemAsync<string>("token"));
-    private ValueTask<string> Token => _token.Value;
-
     public async Task<bool> AddGroup(string name)
     {
-        var token = await _token.Value;
-
-        if (string.IsNullOrWhiteSpace(token))
+        var token = await authService.TryGetAuthToken();
+        
+        if (string.IsNullOrEmpty(token))
         {
             return false;
         }
@@ -29,9 +26,9 @@ public class FriendsService(HttpClient client, ILocalStorageService localStorage
 
     public async Task<IEnumerable<GroupViewModel>> GetGroups()
     {
-        var token = await _token.Value;
-
-        if (string.IsNullOrWhiteSpace(token))
+        var token = await authService.TryGetAuthToken();
+        
+        if (string.IsNullOrEmpty(token))
         {
             return Array.Empty<GroupViewModel>();
         }

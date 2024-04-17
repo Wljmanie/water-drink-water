@@ -1,25 +1,18 @@
-﻿using System.Diagnostics;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
 using viewmodels;
 
 namespace blazor.wa.tbd.Services;
 
 public class UserService(
     HttpClient client,
-    AuthenticationStateProvider authenticationStateProvider,
-    ILocalStorageService localStorage)
+    AuthService authService)
 {
-    private readonly Lazy<ValueTask<string>> _token = new(value: localStorage.GetItemAsync<string>("token"));
-    private ValueTask<string> Token => _token.Value;
-
     public async Task<bool> LogConsumption(int fluidOuncesConsumed)
     {
-        var token = await _token.Value;
-
-        if (string.IsNullOrWhiteSpace(token))
+        var token = await authService.TryGetAuthToken();
+        
+        if (string.IsNullOrEmpty(token))
         {
             return false;
         }
@@ -34,30 +27,37 @@ public class UserService(
 
     public async Task<int> GetConsumptionPercentage()
     {
-        var token = await _token.Value;
-
-        if (string.IsNullOrWhiteSpace(token))
+        var token = await authService.TryGetAuthToken();
+        
+        if (string.IsNullOrEmpty(token))
         {
             return 0;
         }
-        
+
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var response = await client.GetAsync("api/consumption");
+        try
+        {
+            var response = await client.GetAsync("api/consumption");
 
-        if (!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
+            {
+                return 0;
+            }
+
+            return await response.Content.ReadFromJsonAsync<int>();
+        }
+        catch (HttpRequestException ex)
         {
             return 0;
         }
-        
-        return await response.Content.ReadFromJsonAsync<int>();
     }
 
     public async Task<PreferencesViewModel?> GetPreferences()
     {
-        var token = await _token.Value;
-
-        if (string.IsNullOrWhiteSpace(token))
+        var token = await authService.TryGetAuthToken();
+        
+        if (string.IsNullOrEmpty(token))
         {
             return null;
         }
@@ -74,9 +74,9 @@ public class UserService(
 
     public async Task<bool> SavePreferences(int targetFluidOunces, string timeZoneId)
     {
-        var token = await _token.Value;
-
-        if (string.IsNullOrWhiteSpace(token))
+        var token = await authService.TryGetAuthToken();
+        
+        if (string.IsNullOrEmpty(token))
         {
             return false;
         }
@@ -87,11 +87,6 @@ public class UserService(
             new { targetFluidOunces, timeZoneId });
 
         return response.IsSuccessStatusCode;
-    }
-
-    public class LoginResponse
-    {
-        public string? Token { get; set; }
     }
 
     public class TimeZoneModel

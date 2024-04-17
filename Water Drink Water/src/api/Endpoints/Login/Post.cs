@@ -19,14 +19,14 @@ public class Post : Endpoint<Post.Parameters, Results<Ok<Post.Response>, BadRequ
         AllowAnonymous();
     }
 
-    public override Task<Results<Ok<Post.Response>, BadRequest>> ExecuteAsync(Parameters req, CancellationToken ct)
+    public override Task<Results<Ok<Response>, BadRequest>> ExecuteAsync(Parameters req, CancellationToken ct)
     {
         var result = _loginService.Login(req.Email, req.Password);
 
         return !result.IsSuccess
             ? Task.FromResult<Results<Ok<Response>, BadRequest>>(TypedResults.BadRequest())
             : Task.FromResult<Results<Ok<Response>, BadRequest>>(TypedResults.Ok(new Response
-                { Token = result.Value }));
+                { Token = result.Value.token, Expiration = result.Value.expiration.Ticks }));
     }
 
     public class Parameters
@@ -37,6 +37,7 @@ public class Post : Endpoint<Post.Parameters, Results<Ok<Post.Response>, BadRequ
 
     public class Response
     {
-        public string? Token { get; set; } = null!;
+        public string Token { get; set; } = null!;
+        public long Expiration { get; set; }
     }
 }

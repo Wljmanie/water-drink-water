@@ -8,12 +8,17 @@ public class Head : EndpointWithoutRequest<Results<Ok, BadRequest>>
     public override void Configure()
     {
         Head("api/validate");
+
+        AllowAnonymous();
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override Task<Results<Ok, BadRequest>> ExecuteAsync(CancellationToken ct)
     {
-        Console.WriteLine("Handling HEAD request");
+        if (!User.Identity?.IsAuthenticated ?? false)
+        {
+            return Task.FromResult<Results<Ok, BadRequest>>(TypedResults.BadRequest());
+        }
 
-        await Task.CompletedTask;
+        return Task.FromResult<Results<Ok, BadRequest>>(TypedResults.Ok());
     }
 }
