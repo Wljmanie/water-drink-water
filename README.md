@@ -17,7 +17,7 @@ Guidelines
 
 ## Getting Started
 
-- Fork the project.
+- Fork the project, this will create a version of the repository in your GitHub account. You can then work on this, make changes, branches etc. When you're ready, you'll be able to make a Pull-Request from your repository to the main repository.(If you just checkout the project, you won't be able to push any changes you make)
 - Open the solution file.
 - If you are using Visual Studio you may need an extension to view the database, which is SQLite. [SQLiteBrowser](https://sqlitebrowser.org/dl/)
 - Configure the Startup Projects.
