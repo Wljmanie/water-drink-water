@@ -19,10 +19,10 @@
 
 @if (Groups.Any())
 {
-    <ul>
+    <ul class="list-group">
         @foreach (var group in Groups)
         {
-            <li>@group.Name @group.Code</li>
+            <li class="list-group-item d-flex"><span class="p-2 flex-grow-1">@group.Name</span> <span class="p-2">@group.Code</span></li>
         }
     </ul>
 }
