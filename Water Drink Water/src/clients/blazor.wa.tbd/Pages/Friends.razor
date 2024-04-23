@@ -4,8 +4,12 @@
 
 <h3 class="d-flex">
     <span class="flex-fill">Friends</span>
-    <button class="btn btn-primary px-2" @onclick="OnShowModalClick">Add Group</button>
-    <button class="btn btn-primary px-2" @onclick="OnShowJoinModalClick">Join Group</button>
+    <span class="me-2">
+        <button class="btn btn-primary" @onclick="OnShowModalClick">Add Group</button>
+    </span>
+    <span class="me-2">
+        <button class="btn btn-primary" @onclick="OnShowJoinModalClick">Join Group</button>
+    </span>
 </h3>
 
 <Modal @ref="_modal" Title="Add Group">
@@ -21,6 +25,10 @@
 <Modal @ref="_joinModal" Title="Join Group">
     <BodyTemplate>
         <InputText Label="Group Code" DisplayName="Group Code" @bind-Value="_groupCode"/>
+        @if (!_groupCodeIsValid)
+        {
+            <FluentLabel Color="Color.Warning">Invalid Group Code</FluentLabel>
+        }
     </BodyTemplate>
     <FooterTemplate>
         <Button Color="ButtonColor.Secondary" @onclick="OnHideJoinModalClick">Close</Button>

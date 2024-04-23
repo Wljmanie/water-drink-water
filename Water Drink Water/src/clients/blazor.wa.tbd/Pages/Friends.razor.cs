@@ -13,6 +13,7 @@ public partial class Friends
     private Modal _joinModal = null!;
     private string _groupName = string.Empty;
     private string _groupCode = string.Empty;
+    private bool _groupCodeIsValid = true;
 
     private IEnumerable<GroupViewModel> Groups { get; set; } = Array.Empty<GroupViewModel>();
 
@@ -44,6 +45,8 @@ public partial class Friends
     private async Task OnShowJoinModalClick()
     {
         await _joinModal.ShowAsync();
+
+        _groupCodeIsValid = true;
     }
 
     private async Task OnHideJoinModalClick()
@@ -53,11 +56,13 @@ public partial class Friends
 
     private async Task OnJoinGroupClick()
     {
-        if (await FriendsService.JoinGroup(_groupCode))
+        _groupCodeIsValid = await FriendsService.JoinGroup(_groupCode);
+
+        if (_groupCodeIsValid)
         {
             Groups = await FriendsService.GetGroups();
 
-            await _modal.HideAsync();
+            await _joinModal.HideAsync();
         }
     }
 }
