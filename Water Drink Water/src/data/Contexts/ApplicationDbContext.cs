@@ -9,6 +9,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Account> Accounts { get; set; } = null!;
     public DbSet<Group> Groups { get; set; } = null!;
     public DbSet<Consumption> Logs { get; set; } = null!;
+    public DbSet<Membership> Memberships { get; set; } = null!;
     public DbSet<Preference> Preferences { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

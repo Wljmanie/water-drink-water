@@ -8,9 +8,9 @@ namespace TbdFriends.WaterDrinkWater.Application.Services;
 
 public class GroupService(IGroupRepository repository, ICodeGenerator codeGenerator)
 {
-    public Result AddNewGroup(string name, int userId)
+    public Result AddNewGroup(string name, int accountId)
     {
-        var group = repository.GetByName(name, userId);
+        var group = repository.GetByName(name, accountId);
 
         if (group is not null)
         {
@@ -20,7 +20,7 @@ public class GroupService(IGroupRepository repository, ICodeGenerator codeGenera
         repository.Add(new Group
         {
             Name = name,
-            OwnerId = userId,
+            OwnerId = accountId,
             Code = codeGenerator.GenerateCode(),
             DateAdded = DateTime.UtcNow
         });
@@ -28,9 +28,9 @@ public class GroupService(IGroupRepository repository, ICodeGenerator codeGenera
         return Result.Success();
     }
 
-    public IEnumerable<GroupViewModel> GetGroups(int userId)
+    public IEnumerable<GroupViewModel> GetGroups(int accountId)
     {
-        var groups = repository.GetGroups(userId);
+        var groups = repository.GetGroups(accountId);
 
         return groups.Select(g => new GroupViewModel
         {
@@ -38,5 +38,32 @@ public class GroupService(IGroupRepository repository, ICodeGenerator codeGenera
             Name = g.Name,
             Code = g.Code
         });
+    }
+
+    public bool JoinGroup(string code, int accountId)
+    {
+        var group = repository.GetByCode(code);
+
+        if (group is null)
+        {
+            return false;
+        }
+
+        if (group.OwnerId == accountId)
+        {
+            return false;
+        }
+
+        var isAlreadyAMember = repository.GetMembershipsForGroup(group.Id)
+            .Any(m => m.AccountId == accountId);
+
+        if (isAlreadyAMember)
+        {
+            return false;
+        }
+
+        repository.AddMembership(new Membership { GroupId = group.Id, AccountId = accountId });
+
+        return true;
     }
 }
