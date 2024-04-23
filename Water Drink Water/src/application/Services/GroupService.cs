@@ -10,20 +10,24 @@ public class GroupService(IGroupRepository repository, ICodeGenerator codeGenera
 {
     public Result AddNewGroup(string name, int accountId)
     {
-        var group = repository.GetByName(name, accountId);
+        var existingGroup = repository.GetByName(name, accountId);
 
-        if (group is not null)
+        if (existingGroup is not null)
         {
             return Result.Conflict();
         }
 
-        repository.Add(new Group
+        var group = new Group
         {
             Name = name,
             OwnerId = accountId,
             Code = codeGenerator.GenerateCode(),
             DateAdded = DateTime.UtcNow
-        });
+        };
+
+        repository.Add(group);
+
+        repository.AddMembership(new Membership { GroupId = group.Id, AccountId = accountId });
 
         return Result.Success();
     }
@@ -37,7 +41,14 @@ public class GroupService(IGroupRepository repository, ICodeGenerator codeGenera
             Id = g.Id,
             Name = g.Name,
             Code = g.Code,
-            IsOwner = g.OwnerId == accountId
+            OwnedByMe = g.OwnerId == accountId,
+            Members = repository.GetMembershipsForGroup(g.Id)
+                .Select(m => new MemberViewModel
+                {
+                    Id = m.AccountId,
+                    Name = m.Account.Name,
+                    IsOwner = g.OwnerId == m.AccountId
+                })
         });
     }
 
