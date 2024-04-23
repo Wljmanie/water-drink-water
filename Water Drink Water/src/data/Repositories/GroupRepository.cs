@@ -28,7 +28,7 @@ public class GroupRepository(IDbContextFactory<ApplicationDbContext> factory) : 
         using var context = factory.CreateDbContext();
 
         return context.Groups
-            .Where(g => g.OwnerId == accountId)
+            .Where(g => g.OwnerId == accountId || g.Memberships.Any(m => m.AccountId == accountId))
             .ToList();
     }
 

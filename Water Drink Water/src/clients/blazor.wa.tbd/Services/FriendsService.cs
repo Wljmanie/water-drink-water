@@ -10,7 +10,7 @@ public class FriendsService(HttpClient client, AuthService authService)
     public async Task<bool> AddGroup(string name)
     {
         var token = await authService.TryGetAuthToken();
-        
+
         if (string.IsNullOrEmpty(token))
         {
             return false;
@@ -27,7 +27,7 @@ public class FriendsService(HttpClient client, AuthService authService)
     public async Task<IEnumerable<GroupViewModel>> GetGroups()
     {
         var token = await authService.TryGetAuthToken();
-        
+
         if (string.IsNullOrEmpty(token))
         {
             return Array.Empty<GroupViewModel>();
@@ -43,5 +43,22 @@ public class FriendsService(HttpClient client, AuthService authService)
         }
 
         return await response.Content.ReadFromJsonAsync<IEnumerable<GroupViewModel>>();
+    }
+
+    public async Task<bool> JoinGroup(string code)
+    {
+        var token = await authService.TryGetAuthToken();
+
+        if (string.IsNullOrEmpty(token))
+        {
+            return false;
+        }
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await client.PostAsJsonAsync($"api/groups/{code}/join",
+            new { code });
+
+        return response.IsSuccessStatusCode;
     }
 }
