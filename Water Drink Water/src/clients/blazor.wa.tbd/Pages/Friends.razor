@@ -4,7 +4,8 @@
 
 <h3 class="d-flex">
     <span class="flex-fill">Friends</span>
-    <button class="btn btn-primary" @onclick="OnShowModalClick">Add Group</button>
+    <button class="btn btn-primary px-2" @onclick="OnShowModalClick">Add Group</button>
+    <button class="btn btn-primary px-2" @onclick="OnShowJoinModalClick">Join Group</button>
 </h3>
 
 <Modal @ref="_modal" Title="Add Group">
@@ -17,12 +18,24 @@
     </FooterTemplate>
 </Modal>
 
+<Modal @ref="_joinModal" Title="Join Group">
+    <BodyTemplate>
+        <InputText Label="Group Code" DisplayName="Group Code" @bind-Value="_groupCode"/>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideJoinModalClick">Close</Button>
+        <Button Color="ButtonColor.Primary" @onclick="OnJoinGroupClick">Join</Button>
+    </FooterTemplate>
+</Modal>
+
 @if (Groups.Any())
 {
     <ul class="list-group">
         @foreach (var group in Groups)
         {
-            <li class="list-group-item d-flex"><span class="p-2 flex-grow-1">@group.Name</span> <span class="p-2">@group.Code</span></li>
+            <li class="list-group-item d-flex">
+                <span class="p-2 flex-grow-1">@group.Name</span> <span class="p-2">@group.Code</span>
+            </li>
         }
     </ul>
 }

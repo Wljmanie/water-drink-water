@@ -10,7 +10,9 @@ public partial class Friends
     [Inject] FriendsService FriendsService { get; set; } = null!;
 
     private Modal _modal = null!;
+    private Modal _joinModal = null!;
     private string _groupName = string.Empty;
+    private string _groupCode = string.Empty;
 
     private IEnumerable<GroupViewModel> Groups { get; set; } = Array.Empty<GroupViewModel>();
 
@@ -24,7 +26,7 @@ public partial class Friends
         if (await FriendsService.AddGroup(_groupName))
         {
             Groups = await FriendsService.GetGroups();
-            
+
             await _modal.HideAsync();
         }
     }
@@ -37,5 +39,25 @@ public partial class Friends
     private async Task OnHideModalClick()
     {
         await _modal.HideAsync();
+    }
+
+    private async Task OnShowJoinModalClick()
+    {
+        await _joinModal.ShowAsync();
+    }
+
+    private async Task OnHideJoinModalClick()
+    {
+        await _joinModal.HideAsync();
+    }
+
+    private async Task OnJoinGroupClick()
+    {
+        if (await FriendsService.JoinGroup(_groupCode))
+        {
+            Groups = await FriendsService.GetGroups();
+
+            await _modal.HideAsync();
+        }
     }
 }
