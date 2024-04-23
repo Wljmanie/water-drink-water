@@ -53,6 +53,8 @@ public class GroupRepository(IDbContextFactory<ApplicationDbContext> factory) : 
         using var context = factory.CreateDbContext();
 
         return context.Memberships
+            .Include(m => m.Account)
+            .Include(m => m.Group)
             .Where(m => m.GroupId == groupId)
             .ToList();
     }

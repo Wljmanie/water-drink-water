@@ -41,7 +41,14 @@ public class GroupService(IGroupRepository repository, ICodeGenerator codeGenera
             Id = g.Id,
             Name = g.Name,
             Code = g.Code,
-            IsOwner = g.OwnerId == accountId
+            OwnedByMe = g.OwnerId == accountId,
+            Members = repository.GetMembershipsForGroup(g.Id)
+                .Select(m => new MemberViewModel
+                {
+                    Id = m.AccountId,
+                    Name = m.Account.Name,
+                    IsOwner = g.OwnerId == m.AccountId
+                })
         });
     }
 
