@@ -36,7 +36,8 @@ public class GroupService(IGroupRepository repository, ICodeGenerator codeGenera
         {
             Id = g.Id,
             Name = g.Name,
-            Code = g.Code
+            Code = g.Code,
+            IsOwner = g.OwnerId == accountId
         });
     }
 

@@ -9,4 +9,5 @@ public class Group
     public DateTime DateAdded { get; set; }
 
     public virtual Account Owner { get; set; } = null!;
+    public virtual ICollection<Membership> Memberships { get; set; } = null!;
 }
