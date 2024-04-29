@@ -38,12 +38,27 @@
 
 @if (Groups.Any())
 {
-    <ul class="list-group">
+    <FluentLayout>
         @foreach (var group in Groups)
         {
-            <li class="list-group-item d-flex">
-                <span class="p-2 flex-grow-1">@group.Name</span> <span class="p-2">@group.Code</span>
-            </li>
+            <div class="mb-3">
+                <FluentHeader>
+                    <span class="p-2 flex-grow-1 fs-5">@group.Name</span> <span class="p-2 fs-3">@group.Code</span>
+                </FluentHeader>
+                <span>
+                    <ul class="list-group">
+                        @foreach (var member in group.Members)
+                        {
+                            <li class="list-group-item d-flex">
+                                <span class="p-2 flex-grow-1">@member.Name</span>
+                                <span class="p-2">
+                                    <FluentProgress Min="0" Max="100" Value="@member.Progress" Width="200px" Stroke="ProgressStroke.Large"/>
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                </span>
+            </div>
         }
-    </ul>
+    </FluentLayout>
 }
