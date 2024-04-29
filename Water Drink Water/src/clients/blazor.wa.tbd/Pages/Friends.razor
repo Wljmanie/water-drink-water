@@ -51,6 +51,9 @@
                         {
                             <li class="list-group-item d-flex">
                                 <span class="p-2 flex-grow-1">@member.Name</span>
+                                <span class="p-2">
+                                    <FluentProgress Min="0" Max="100" Value="@member.Progress" Width="200px" Stroke="ProgressStroke.Large"/>
+                                </span>
                             </li>
                         }
                     </ul>
