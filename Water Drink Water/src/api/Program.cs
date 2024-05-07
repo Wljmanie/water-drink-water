@@ -1,9 +1,9 @@
-using System.Text;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using TbdFriends.WaterDrinkWater.Api.Infrastructure;
 using TbdFriends.WaterDrinkWater.Application.Contracts;
 using TbdFriends.WaterDrinkWater.Application.Infrastructure;
@@ -32,7 +32,7 @@ builder.Services.AddTransient<IConsumptionRepository, ConsumptionRepository>();
 builder.Services.AddTransient<IGroupRepository, GroupRepository>();
 
 builder.Services.AddScoped<AccountService>(provider => new AccountService(
-    provider.GetRequiredService<IAccountRepository>(),
+    provider.GetRequiredService<IAccountRepository>(), provider.GetRequiredService<IConsumptionRepository>(),
     (password) => new Password(password)));
 
 builder.Services.AddScoped<ConsumptionService>();
@@ -63,7 +63,7 @@ builder.Services.AddAuthentication(options =>
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            LifetimeValidator = (before, expires, token, parameters) => 
+            LifetimeValidator = (before, expires, token, parameters) =>
             {
                 if (expires is not null)
                 {
